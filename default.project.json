@@ -9,6 +9,11 @@
       }
     },
 
+    "Packages" : {
+      "$path" : "Packages",
+      "$ignoreUnknownInstances": true
+    },
+
     "ServerScriptService": {
       "Server": {
         "$path": "src/server"

@@ -1,0 +1,12 @@
+[package]
+name = "user/the-roulette"
+version = "0.1.0"
+registry = "https://github.com/UpliftGames/wally-index"
+realm = "shared"
+
+[dependencies]
+cmdr = "evaera/cmdr@1.9.0"
+import = "vocksel/import@2.1.0"
+roact = "roblox/roact@1.4.4"
+janitor = "howmanysmall/janitor@1.15.1"
+trove = "sleitnick/trove@0.5.0"
