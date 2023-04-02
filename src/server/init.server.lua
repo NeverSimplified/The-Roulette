@@ -8,9 +8,14 @@ import.setAliases({
     shared = ReplicatedStorage,
     Packages = ReplicatedStorage.Packages,
 })
-
+local Promise = import("Packages/promise")
 for i,module in pairs(script.Modules:GetChildren()) do
     if module:IsA("ModuleScript") then
-        require(module):init()
+        local promised = Promise.new(function(resolve, reject, onCancel)
+            require(module):init()
+        end):catch(function(error)
+            warn(`[SERVER INITIALISATION]: Something failed!: {error}`)
+        end)
     end
 end
+print('[SERVER-FRAMEWORK]: Initialising.')
