@@ -2,9 +2,8 @@
   "name": "The-Roulette",
   "tree": {
     "$className": "DataModel",
-
     "ReplicatedStorage": {
-      "Common": {
+      "SharedObjects": {
         "$path": "src/shared"
       },
       "Packages": {
@@ -14,14 +13,14 @@
     },
 
     "ServerScriptService": {
-      "Server": {
+      "ServerCode": {
         "$path": "src/server"
       }
     },
 
     "StarterPlayer": {
       "StarterPlayerScripts": {
-        "Client": {
+        "ClientCode": {
           "$path": "src/client"
         }
       }
