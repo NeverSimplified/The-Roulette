@@ -9,7 +9,7 @@ import.setAliases({
     Packages = ReplicatedStorage.Packages,
 })
 
-for i,module in pairs(script:GetChildren()) do
+for i,module in pairs(script.Modules:GetChildren()) do
     if module:IsA("ModuleScript") then
         require(module):init()
     end
