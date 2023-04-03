@@ -9,7 +9,7 @@ import.setAliases({
     Packages = ReplicatedStorage.Packages,
 })
 local Promise = import("Packages/promise")
-for i,module in pairs(script.Modules:GetChildren()) do
+for i,module in pairs(script.ServerCode:GetChildren()) do
     if module:IsA("ModuleScript") then
         local promised = Promise.new(function(resolve, reject, onCancel)
             require(module):init()

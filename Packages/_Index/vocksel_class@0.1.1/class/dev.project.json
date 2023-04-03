@@ -1,0 +1,19 @@
+{
+  "name": "class (dev)",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "Packages": {
+        "$path": "Packages",
+        "class": {
+          "$path": "src"
+        }
+      }
+    },
+    "ServerScriptService": {
+      "Tests": {
+        "$path": "tests"
+      }
+    }
+  }
+}
