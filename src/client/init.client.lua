@@ -1,19 +1,42 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local StarterPlayer = game:GetService("StarterPlayer")
 local import = require(ReplicatedStorage.Packages.import)
+local FrameworkMain = {}
 import.setAliases({
-    client = StarterPlayer.StarterPlayerScripts,
-    shared = ReplicatedStorage,
-    Packages = ReplicatedStorage.Packages,
+    Client = game.StarterPlayer.StarterPlayerScripts.Framework,
+    Shared = game.ReplicatedStorage.Shared,
+    Services = game.StarterPlayer.StarterPlayerScripts.Framework.Services,
+    Modules = game.StarterPlayer.StarterPlayerScripts.Framework.Modules,
+    Packages = game.ReplicatedStorage.Packages,
 })
-local Promise = import("Packages/promise")
-for i,module in pairs(script.ClientCode:GetChildren()) do
-    if module:IsA("ModuleScript") then
-        local promised = Promise.new(function(resolve, reject, onCancel)
-            require(module):init()
-        end):catch(function(error)
-            warn(`[CLIENT INITIALISATION]: Something failed!: {error}`)
-        end)
+local ServiceStorage = import("Shared/ServiceStorage")
+local Services = {
+    "Decorative/radioService";
+    "Utility/LightService";
+}
+function FrameworkMain:BootServices()
+    for _, serviceName in pairs(Services) do
+        local success,service = pcall(import, `Services/{serviceName}`)
+        if success then
+            service:__init(service.ClassName)
+            ServiceStorage(service.ClassName, service)
+            print(`Successfully initialized: {serviceName}`)
+        else
+            warn(`Failed Initializing ({serviceName}), {service}`)
+        end
     end
+    print('Client Services initialized.')
 end
-print('[CLIENT-FRAMEWORK]: Initialising.')
+function FrameworkMain:StartServices()
+    for name, service in pairs(ServiceStorage) do
+        local success,err = pcall(service.Start, service)
+        if not success then
+            warn(`{name} has failed while starting. {err}`)
+        end
+    end
+    print('Client Services started.')
+end
+function FrameworkMain:BootFramework()
+    self:BootServices()
+    self:StartServices()
+end
+FrameworkMain:BootFramework()

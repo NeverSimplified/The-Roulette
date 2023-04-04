@@ -3,7 +3,7 @@
   "tree": {
     "$className": "DataModel",
     "ReplicatedStorage": {
-      "SharedObjects": {
+      "Shared": {
         "$path": "src/shared"
       },
       "Packages": {
@@ -13,14 +13,14 @@
     },
 
     "ServerScriptService": {
-      "ServerCode": {
+      "Framework": {
         "$path": "src/server"
       }
     },
 
     "StarterPlayer": {
       "StarterPlayerScripts": {
-        "ClientCode": {
+        "Framework": {
           "$path": "src/client"
         }
       }
