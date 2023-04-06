@@ -1,19 +1,26 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local import = require(ReplicatedStorage.Packages.import)
 local FrameworkMain = {}
+local TimeElapsed
 import.setAliases({
-    Client = game.StarterPlayer.StarterPlayerScripts.Framework,
+    ReplicatedStorage = game.ReplicatedStorage,
     Shared = game.ReplicatedStorage.Shared,
-    Services = game.StarterPlayer.StarterPlayerScripts.Framework.Services,
-    Modules = game.StarterPlayer.StarterPlayerScripts.Framework.Modules,
+    Services = script.Services,
+    Modules = script.Modules,
     Packages = game.ReplicatedStorage.Packages,
 })
 local ServiceStorage = import("Shared/ServiceStorage")
 local Services = {
     "Decorative/radioService";
     "Utility/LightService";
+    "Utility/PlayerNetwork";
+    "Utility/ShakeService";
+    "Utility/DeathService";
+    "Administration/AdminService";
 }
 function FrameworkMain:BootServices()
+    warn('---- [ LOADING SYSTEMS ] ----')
+    TimeElapsed = os.clock()
     for _, serviceName in pairs(Services) do
         local success,service = pcall(import, `Services/{serviceName}`)
         if success then
@@ -34,6 +41,8 @@ function FrameworkMain:StartServices()
         end
     end
     print('Client Services started.')
+    warn('---- [ LOADING FINISHED ] ----')
+    warn(`---- TIME TAKEN: {math.ceil(os.clock()-TimeElapsed)} SECONDS ----`)
 end
 function FrameworkMain:BootFramework()
     self:BootServices()

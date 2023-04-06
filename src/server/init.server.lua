@@ -2,8 +2,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local import = require(ReplicatedStorage.Packages.import)
 local FrameworkMain = {}
 import.setAliases({
-    Server = game.ServerScriptService.Framework,
-    Client = game.StarterPlayer.StarterPlayerScripts.Framework,
     Shared = game.ReplicatedStorage.Shared,
     Services = game.ServerScriptService.Framework.Services,
     Modules = game.ServerScriptService.Framework.Modules,
@@ -11,8 +9,24 @@ import.setAliases({
 })
 local ServiceStorage = import("Shared/ServiceStorage")
 local Services = {
-
+    "RoundService",
+    "AdminService",
+    "DeathManager";
+    "PlayerSetup";
 }
+
+local Red = import("Packages/red")
+
+local Nets = { -- preload the nets needed by server which are in modules or don't exist on server;
+    "HumanoidStates";
+    "ObjectVelocity";
+    "CameraShake";
+}
+
+for i,net in pairs(Nets) do
+    Red.Server(net, {net})
+end
+
 function FrameworkMain:BootServices()
     for _, serviceName in pairs(Services) do
         local success,service = pcall(import, `Services/{serviceName}`)

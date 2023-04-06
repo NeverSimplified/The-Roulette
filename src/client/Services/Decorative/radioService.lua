@@ -35,7 +35,6 @@ end
 function RadioUI:render()
     return Roact.createElement("BillboardGui", {
         [Roact.Ref] = self.HolderRef;
-        Name = 'RadioInterface';
         Size = UDim2.fromScale(8,0.5);
         AlwaysOnTop = true;
         SizeOffset = Vector2.new(0,2);
