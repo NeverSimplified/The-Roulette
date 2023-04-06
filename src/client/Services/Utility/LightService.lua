@@ -12,7 +12,7 @@ local Every = Array.every
 local LightService, super = Class("LightService", Superclass)
 
 function LightService:__init()
-    super:__init(self.ClassName)
+    super.__init(self)
 end
 
 function LightService:Start()

@@ -9,7 +9,7 @@ local Red = import("Packages/red")
 local PlayerNetwork, super = class("PlayerNetwork", Superclass)
 
 function PlayerNetwork:__init()
-    super:__init(self.ClassName)
+    super.__init(self)
 end
 
 function PlayerNetwork:Start() 

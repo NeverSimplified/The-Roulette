@@ -62,7 +62,7 @@ function RadioUI:didMount()
 end
 
 function radioService:__init()
-    SClass:__init(self.ClassName)
+    SClass.__init(self)
 end
 
 function radioService:Start()

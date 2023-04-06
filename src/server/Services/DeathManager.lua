@@ -16,7 +16,7 @@ local Traced = {}
 local DeathManagerService, super = class("DeathManager", Superclass)
 
 function DeathManagerService:__init()
-    super:__init(self.ClassName)
+    super.__init(self)
 end
 
 function DeathManagerService:Start()

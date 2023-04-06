@@ -42,7 +42,7 @@ function ColoringUI:render()
 end
 
 function ShakeService:__init()
-    super:__init(self.ClassName)
+    super.__init(self)
 end
 
 function ShakeService:Start()

@@ -8,7 +8,7 @@ local Superclass = import("Shared/Superclass/Service")
 local PlayerSetup, super = class("PlayerSetup", Superclass)
 
 function PlayerSetup:__init()
-    super:__init(self.ClassName)
+    super.__init(self)
 end
 
 function PlayerSetup:Start()

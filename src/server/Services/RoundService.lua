@@ -12,7 +12,7 @@ function ServerToggleLights()
 end
 
 function RoundService:__init()
-    super:__init(self.ClassName)
+    super.__init(self)
 end
 
 function RoundService:Start()

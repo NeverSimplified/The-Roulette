@@ -8,7 +8,7 @@ local Superclass = import("Shared/Superclass/Service")
 local AdminService, super = class("AdminService", Superclass)
 
 function AdminService:__init()
-    super:__init(self.ClassName)
+    super.__init(self)
 end
 
 function AdminService:Start()

@@ -68,7 +68,7 @@ function onCharacter(character)
 end
 
 function DeathService:__init()
-    super:__init(self.ClassName)
+    super.__init(self)
 end
 
 function DeathService:Start()
