@@ -1,5 +1,5 @@
 return {
-    Name = 'Kill';
+    Name = 'kill';
     Aliases = {'end', "terminate"};
     Description = 'Kills the provided user(s)';
     Group = 2;

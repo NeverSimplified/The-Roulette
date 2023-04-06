@@ -1,13 +1,13 @@
 return {
-    Name = 'Ragdoll';
+    Name = 'ragdoll';
     Aliases = {'ragd', "flop"};
-    Description = 'Ragdolls the provided user';
+    Description = 'Ragdolls the provided user(s)';
     Group = 3;
     Args = {
         {
-            Type = 'player';
-            Name = 'Player';
-            Description = 'Player to ragdoll'
+            Type = 'players';
+            Name = 'Player(s)';
+            Description = 'Player(s) to ragdoll'
         }
     }
 }
