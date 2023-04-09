@@ -8,24 +8,18 @@ local Red = import("Packages/red")
 local CollarTemplate = CollectionService:GetTagged("ShotgunCollar")[1]
 
 local Net = Red.Server("CameraShake", {"CameraShake"})
+local BeepNet = Red.Server("BeepNet", {"BeepNet"})
 
 local Collars = {}
 Collars.__index = Collars
 
 function Collars:ExplodeCollar(timer)
     if timer then
-        local timePercentage = os.clock()
+        BeepNet:FireAll("BeepNet", timer-1, self.Model)
         if self.Model then
-            TweenService:Create(self.Model.light, TweenInfo.new(timer, Enum.EasingStyle.Linear), {Color = Color3.fromRGB(160, 24, 17)}):Play()
+            TweenService:Create(self.Model.light, TweenInfo.new(timer-1, Enum.EasingStyle.Linear), {Color = Color3.fromRGB(160, 24, 17)}):Play()
         end
-        repeat 
-            if self.Model then
-                local Beep = self.Model.Head.beep
-                Beep:Play()
-                Beep.Ended:Wait()
-            end
-            task.wait(math.clamp(1 * (-((os.clock()-timePercentage)/timer)+1), 0.1,1))
-        until os.clock() - timePercentage >= timer
+        task.wait(timer)
     else
         if self.Model then
             self.Model.light.Color = Color3.fromRGB(248, 43, 43)
@@ -38,7 +32,7 @@ function Collars:ExplodeCollar(timer)
             if Player then
                 Net:FireAllExcept(Player,"CameraShake",250,1,Color3.fromRGB(251, 251, 251),0.8,0.5)
             else
-                Net:FireAll("CameraShake",250,1,Color3.fromRGB(255, 57, 57),0.6,0.5)
+                Net:FireAll("CameraShake",250,1,Color3.fromRGB(251, 251, 251),0.8,0.5)
             end
             if self.Model then
                 self.Model.Head.shot:Play()

@@ -20,6 +20,7 @@ local RoundService, super = class("RoundService", Superclass)
 
 local BlindNet = red.Server("BlindNet", {"BlindNet"})
 local BashNet = red.Server("BashNet", {"BashNet"})
+local CleanNet = red.Server("CleanNet", {"CleanNet"})
 
 local PlayingTeam = CollectionService:GetTagged("PlayingTeam")[1]
 local LobbyTeam = CollectionService:GetTagged("LobbyTeam")[1]
@@ -29,7 +30,7 @@ local LightsEnabled = CollectionService:GetTagged("LightsEnabled")[1]
 local ForcedGamemode = CollectionService:GetTagged('ForcedGamemode')[1]
 local GameRunning = false
 
-local MINIMUM_PLAYERS = 2
+local MINIMUM_PLAYERS = 1
 local INTERMISSION_TIME = 5
 
 local RoundTimeTrove = trove.new()
@@ -79,12 +80,9 @@ function RoundService:EndRound()
         end
     end
     task.wait(1.5)
+    CleanNet:FireAll("CleanNet")
     task.spawn(function()
-        local bodies = workspace:WaitForChild("DeadBodies",2)
-        if bodies then
-            bodies:ClearAllChildren()
-        end
-        local LimbDebris = workspace:WaitForChild("LimbDebris", 2)
+        local LimbDebris = workspace:WaitForChild("LimbDebris",1)
         if LimbDebris then
             LimbDebris:ClearAllChildren()
         end

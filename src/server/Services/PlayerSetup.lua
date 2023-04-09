@@ -30,11 +30,11 @@ function PlayerSetup:Start()
                 local ClonedGore = GoreCharacter:Clone()
                 CollectionService:RemoveTag(ClonedGore, 'Gore-Character')
                 ClonedGore.Parent = character
-                ClonedGore.PrimaryPart.CFrame = character.HumanoidRootPart.CFrame
+                ClonedGore.PrimaryPart.CFrame = character.Torso.CFrame
                 local Weld = Instance.new("Weld")
                 Weld.Name = 'Main_Weld'
                 Weld.Part0 = ClonedGore.PrimaryPart
-                Weld.Part1 = character.HumanoidRootPart
+                Weld.Part1 = character.Torso
                 Weld.C0 = Weld.Part0.CFrame:Inverse()
                 Weld.C1 = Weld.Part1.CFrame:Inverse()
                 Weld.Parent = ClonedGore

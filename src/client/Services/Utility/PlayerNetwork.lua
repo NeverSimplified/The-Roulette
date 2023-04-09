@@ -1,3 +1,4 @@
+local TweenService = game:GetService("TweenService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
@@ -34,6 +35,7 @@ function PlayerNetwork:Start()
     local VelocityNet = Red.Client("ObjectVelocity")
     local BlindNet = Red.Client("BlindNet")
     local BashNet = Red.Client("BashNet")
+    local BeepNet = Red.Client("BeepNet")
     local BlockedStates = false
     StateNet:On("HumanoidStates",function(state, blockOthers)
         local Character = Players.LocalPlayer.Character
@@ -70,7 +72,6 @@ function PlayerNetwork:Start()
     })
     local Handle = roact.mount(UI, Players.LocalPlayer.PlayerGui, 'Blindness')
     BlindNet:On("BlindNet",function(visible)
-        print('Received')
         Handle = roact.update(Handle, roact.createElement(Blinder, {
             visible = visible
         }))
@@ -79,6 +80,19 @@ function PlayerNetwork:Start()
         local Bash = CollectionService:GetTagged("Bash")[1]
         if Bash then
             Bash:Play()
+        end
+    end)
+    BeepNet:On("BeepNet", function(timer, model)
+        if model then
+            local timePercentage = os.clock()
+            repeat 
+                if model then
+                    local Beep = model.Head.beep
+                    Beep:Play()
+                    Beep.Ended:Wait()
+                end
+                task.wait(math.clamp(0.7 * (-((os.clock()-timePercentage)/timer)+1), 0.01,1))
+            until os.clock() - timePercentage >= timer+1
         end
     end)
 end

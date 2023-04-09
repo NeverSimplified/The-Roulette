@@ -18,9 +18,9 @@ local LobbyTeam = CollectionService:GetTagged("LobbyTeam")[1]
 
 local DeathRagdoll = red.Server("DeathRagdoll")
 local DeathRespawn = red.Server("DeathRespawn")
+local ClientCorpse = red.Server("ClientCorpse", {"ClientCorpse"})
 
 local Traced = {}
-local DeadBodyTrack = {}
 
 local DeathManagerService, super = class("DeathManager", Superclass)
 
@@ -76,60 +76,11 @@ function DeathManagerService:Start()
                 local Character = player.Character
                 if Character then
                     player.Team = LobbyTeam
-                    Character.Archivable = true
-                    local ClonedCharacter = Character:Clone()
-                    Character.Archivable = false
-                    ClonedCharacter.Parent = Bodies
-                    for _,char in pairs(ClonedCharacter:GetChildren()) do
-                        if char:IsA("BasePart") then
-                            char.CFrame = player.Character:FindFirstChild(char.Name).CFrame
-                        end
-                    end
-                    table.insert(DeadBodyTrack, ClonedCharacter)
-                    Debris:AddItem(ClonedCharacter,30)
+                    ClientCorpse:FireAll("ClientCorpse",Character)
                 end
             end
         end
         player:LoadCharacter()
-    end)
-    RunService.Heartbeat:Connect(function(deltaTime)
-        for i,body in ipairs(DeadBodyTrack) do
-            if not body:FindFirstChildOfClass("Humanoid") then
-                table.remove(DeadBodyTrack, i)
-                continue
-            end
-            local Humanoid = body.Humanoid
-            for _,object in pairs(body:GetDescendants()) do
-                if object:IsA("BasePart") then
-                    if object:IsDescendantOf(workspace) then
-                        if object.Anchored == false then
-                            local IsAnchored = false
-                            for _, v in pairs(object:GetConnectedParts(true)) do
-                                if v.Anchored then
-                                    if v:IsA("Seat") then
-                                        v.Disabled = true
-                                    else
-                                        IsAnchored = true
-                                    end
-                                end
-                            end
-                            if not IsAnchored then
-                                if object:GetNetworkOwner() ~= nil then
-                                    object:SetNetworkOwner(nil)
-                                end
-                            end
-                        end
-                    end
-                elseif object:IsA("Humanoid") then
-                    if object.DisplayDistanceType ~= Enum.HumanoidDisplayDistanceType.None then
-                        object.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
-                    end
-                end
-            end
-            if Humanoid:GetState() ~= Enum.HumanoidStateType.Physics then
-                Humanoid:ChangeState(Enum.HumanoidStateType.Physics)
-            end
-        end
     end)
 end
 
