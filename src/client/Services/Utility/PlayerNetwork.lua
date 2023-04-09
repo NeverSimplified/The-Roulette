@@ -1,12 +1,29 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local import = require(ReplicatedStorage.Packages.import)
 
 local class = import("Packages/class")
 local Superclass = import("Shared/Superclass/Service")
 local Red = import("Packages/red")
+local roact = import("Packages/roact")
 
 local PlayerNetwork, super = class("PlayerNetwork", Superclass)
+
+local Blinder = roact.Component:extend("BlindingUI")
+function Blinder:render()
+    return roact.createElement("ScreenGui", {
+        IgnoreGuiInset = true;
+        ResetOnSpawn = false;
+    },{
+        Frame = roact.createElement("Frame", {
+            Name = 'Darkness is inevitable';
+            Size = UDim2.fromScale(1,1);
+            BackgroundColor3 = Color3.fromRGB(0,0,0);
+            Visible = self.props.visible or false;
+        })
+    })
+end
 
 function PlayerNetwork:__init()
     super.__init(self)
@@ -15,6 +32,8 @@ end
 function PlayerNetwork:Start() 
     local StateNet = Red.Client("HumanoidStates")
     local VelocityNet = Red.Client("ObjectVelocity")
+    local BlindNet = Red.Client("BlindNet")
+    local BashNet = Red.Client("BashNet")
     local BlockedStates = false
     StateNet:On("HumanoidStates",function(state, blockOthers)
         local Character = Players.LocalPlayer.Character
@@ -22,14 +41,11 @@ function PlayerNetwork:Start()
             if blockOthers then
                 BlockedStates = true
                 local Items = Enum.HumanoidStateType:GetEnumItems()
-                local Exceptions = {Enum.HumanoidStateType.None}
-                for i,enum in ipairs(Items) do
-                    if table.find(Exceptions, enum) or enum == state then
-                        table.remove(Items, i)
+                local Exceptions = {Enum.HumanoidStateType.None, state}
+                for _,enum in ipairs(Items) do
+                    if not table.find(Exceptions, enum) then
+                        Character.Humanoid:SetStateEnabled(enum, false)
                     end
-                end
-                for i,validEnum in pairs(Items) do
-                    Character.Humanoid:SetStateEnabled(validEnum, false)
                 end
             else
                 if BlockedStates then
@@ -37,12 +53,9 @@ function PlayerNetwork:Start()
                     local Items = Enum.HumanoidStateType:GetEnumItems()
                     local Exceptions = {Enum.HumanoidStateType.None}
                     for i,enum in ipairs(Items) do
-                        if table.find(Exceptions, enum) then
-                            table.remove(Items, i)
+                        if not table.find(Exceptions, enum) then
+                            Character.Humanoid:SetStateEnabled(enum, true)
                         end
-                    end
-                    for i,validEnum in pairs(Items) do
-                        Character.Humanoid:SetStateEnabled(validEnum, true)
                     end
                 end
             end
@@ -52,6 +65,22 @@ function PlayerNetwork:Start()
     VelocityNet:On("ObjectVelocity",function(object, velocity)
         object:ApplyImpulse(velocity)
     end)
+    local UI = roact.createElement(Blinder, {
+        visible = false
+    })
+    local Handle = roact.mount(UI, Players.LocalPlayer.PlayerGui, 'Blindness')
+    BlindNet:On("BlindNet",function(visible)
+        print('Received')
+        Handle = roact.update(Handle, roact.createElement(Blinder, {
+            visible = visible
+        }))
+    end)
+    BashNet:On("BashNet", function()
+        local Bash = CollectionService:GetTagged("Bash")[1]
+        if Bash then
+            Bash:Play()
+        end
+    end)
 end
 
-return PlayerNetwork
+return PlayerNetwork.new()

@@ -16,4 +16,4 @@ function AdminService:Start()
     cmdr:RegisterHooksIn(script.Hooks)
 end
 
-return AdminService
+return AdminService.new()

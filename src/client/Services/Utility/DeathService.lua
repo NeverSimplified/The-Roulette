@@ -81,4 +81,4 @@ function DeathService:Start()
     end)
 end
 
-return DeathService
+return DeathService.new()

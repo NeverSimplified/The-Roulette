@@ -3,10 +3,11 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local import = require(ReplicatedStorage.Packages.import)
 
+local RandomNum = Random.new()
+
 local class = import("Packages/class")
 local Superclass = import("Shared/Superclass/Service")
 local Red = import("Packages/red")
-local Shake = import("Packages/shake")
 local Roact = import("Packages/roact")
 local Flipper = import("Packages/flipper")
 
@@ -47,20 +48,31 @@ end
 
 function ShakeService:Start()
     local ClientShake = Red.Client("CameraShake")
-    ClientShake:On("CameraShake", function(amplitude, frequency, FadeOutTime, SustainTime, coloring, Transparency, velocity)
-        local camShake = Shake.new()
-        local function ShakeCamera(pos, rot, done)
-            workspace.CurrentCamera.CFrame *= CFrame.new(pos) * CFrame.Angles(rot.X, rot.Y, rot.Z)
-            if done then
-                camShake:Stop()
+    ClientShake:On("CameraShake", function(strength, length, coloring, Transparency, velocity)
+        task.spawn(function()
+            local BeginTime = os.clock()
+            while true do
+                if os.clock() - BeginTime >= length then
+                    break
+                end
+                local Percentage = 1-((os.clock() - BeginTime) / length)
+                local X = RandomNum:NextInteger(-strength,strength) / 1000 * Percentage
+                local Y = RandomNum:NextInteger(-strength,strength) / 1000 * Percentage
+                local Z = RandomNum:NextInteger(-strength,strength) / 1000 * Percentage
+                local Character = Players.LocalPlayer.Character
+                if Character then
+                    local Humanoid = Character.Humanoid
+                    Humanoid.CameraOffset = Vector3.new(X,Y,Z)
+                    workspace.CurrentCamera.CFrame *= CFrame.Angles(X/strength, Y/strength, Z/strength)
+                end
+                task.wait()
             end
-        end
-        camShake.Amplitude = amplitude
-        camShake.Frequency = frequency
-        camShake.FadeOutTime = FadeOutTime
-        camShake.SustainTime = SustainTime
-        camShake:OnSignal(RunService.Heartbeat, ShakeCamera)
-        camShake:Start()
+            local Character = Players.LocalPlayer.Character
+            if Character then
+                local Humanoid = Character.Humanoid
+                Humanoid.CameraOffset = Vector3.new(0,0,0)
+            end
+        end)
         if coloring then
             local UI = Roact.createElement(ColoringUI, {
                 Color = coloring,
@@ -74,4 +86,4 @@ function ShakeService:Start()
     end)
 end
 
-return ShakeService
+return ShakeService.new()

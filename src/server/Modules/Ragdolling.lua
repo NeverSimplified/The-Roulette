@@ -44,9 +44,9 @@ function Ragdolling:Ragdoll(character)
         end
     end
     local P = Players:GetPlayerFromCharacter(character)
-    StateNet:Fire(P,"HumanoidStates", Enum.HumanoidStateType.Ragdoll, true)
+    StateNet:Fire(P,"HumanoidStates", Enum.HumanoidStateType.Physics, true)
     if character.Torso.AssemblyLinearVelocity.Magnitude <= 10 then
-        VelocityNet:Fire(P,"ObjectVelocity", character.Torso, (character.PrimaryPart.Position - (character.PrimaryPart.CFrame * CFrame.new(0,0,-5)).Position).Unit * 175)
+        VelocityNet:Fire(P,"ObjectVelocity", character.Torso, (character.Torso.Position - (character.Torso.CFrame * CFrame.new(0,0,-5)).Position).Unit * 175)
     end
 end
 

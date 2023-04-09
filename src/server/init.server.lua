@@ -13,6 +13,7 @@ local Services = {
     "AdminService",
     "DeathManager";
     "PlayerSetup";
+    "LimbHealthService";
 }
 
 local Red = import("Packages/red")
@@ -31,7 +32,6 @@ function FrameworkMain:BootServices()
     for _, serviceName in pairs(Services) do
         local success,service = pcall(import, `Services/{serviceName}`)
         if success then
-            service:__init(service.ClassName)
             ServiceStorage(service.ClassName, service)
             print(`Successfully initialized: {serviceName}`)
         else

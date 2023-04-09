@@ -160,4 +160,4 @@ function radioService:Start()
     end)
 end
 
-return radioService
+return radioService.new()

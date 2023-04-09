@@ -12,10 +12,12 @@ import.setAliases({
 local ServiceStorage = import("Shared/ServiceStorage")
 local Services = {
     "Decorative/radioService";
+    "Decorative/LimbClientService";
     "Utility/LightService";
     "Utility/PlayerNetwork";
     "Utility/ShakeService";
     "Utility/DeathService";
+    "Utility/GameTextService";
     "Administration/AdminService";
 }
 function FrameworkMain:BootServices()
@@ -24,7 +26,6 @@ function FrameworkMain:BootServices()
     for _, serviceName in pairs(Services) do
         local success,service = pcall(import, `Services/{serviceName}`)
         if success then
-            service:__init(service.ClassName)
             ServiceStorage(service.ClassName, service)
             print(`Successfully initialized: {serviceName}`)
         else

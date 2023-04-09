@@ -16,4 +16,4 @@ function AdminService:Start()
     cmdr:SetActivationKeys({Enum.KeyCode.F2, Enum.KeyCode.Semicolon})
 end
 
-return AdminService
+return AdminService.new()
