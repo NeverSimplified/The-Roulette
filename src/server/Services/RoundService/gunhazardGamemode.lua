@@ -108,7 +108,7 @@ function Round.Start(ActivePlayers, ChairsDictionary)
                             Parent:SetGameText(`{RandomPlayer.Name} has shot: {target.Name}.`)
                         end
                     end)
-                    promise.try(function()
+                    promise.try(function() 
                         for i = timer,0,-1 do
                             if Shot or GameOver or not table.find(ActivePlayers,RandomPlayer) then
                                 break
