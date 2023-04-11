@@ -30,6 +30,14 @@ function ReplaceM6DWithBallSocket(Motor)
 end
 
 function Ragdolling:Ragdoll(character)
+    if character.Humanoid.Sit then
+        local P = Players:GetPlayerFromCharacter(character)
+        if P then
+            StateNet:Fire(P,"HumanoidStates", Enum.HumanoidStateType.Jumping, true)
+        end
+        character.Humanoid.Jump = true
+        character.Humanoid.Sit = false
+    end
     for _,Motor in pairs(character:GetDescendants()) do
         if Motor:IsA("Motor6D") then
             if Motor.Name == 'RootJoint' then
@@ -44,9 +52,11 @@ function Ragdolling:Ragdoll(character)
         end
     end
     local P = Players:GetPlayerFromCharacter(character)
-    StateNet:Fire(P,"HumanoidStates", Enum.HumanoidStateType.Physics, true)
-    if character.Torso.AssemblyLinearVelocity.Magnitude <= 10 then
-        VelocityNet:Fire(P,"ObjectVelocity", character.Torso, (character.Torso.Position - (character.Torso.CFrame * CFrame.new(0,0,-5)).Position).Unit * 175)
+    if P then
+        StateNet:Fire(P,"HumanoidStates", Enum.HumanoidStateType.Physics, true)
+        if character.Torso.AssemblyLinearVelocity.Magnitude <= 10 then
+            VelocityNet:Fire(P,"ObjectVelocity", character.Torso, (character.Torso.Position - (character.Torso.CFrame * CFrame.new(0,0,-5)).Position).Unit * 175)
+        end
     end
 end
 
@@ -60,7 +70,9 @@ function Ragdolling:UnRagdoll(character)
         end
     end
     local P = Players:GetPlayerFromCharacter(character)
-    StateNet:Fire(P, "HumanoidStates", Enum.HumanoidStateType.GettingUp, false)
+    if P then
+        StateNet:Fire(P, "HumanoidStates", Enum.HumanoidStateType.GettingUp, false)
+    end
 end
 
 return Ragdolling

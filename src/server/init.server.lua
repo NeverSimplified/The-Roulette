@@ -14,6 +14,7 @@ local Services = {
     "DeathManager";
     "PlayerSetup";
     "LimbHealthService";
+    "GunService";
 }
 
 local Red = import("Packages/red")

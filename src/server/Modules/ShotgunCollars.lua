@@ -13,6 +13,8 @@ local BeepNet = Red.Server("BeepNet", {"BeepNet"})
 local Collars = {}
 Collars.__index = Collars
 
+local ActiveCollars = {}
+
 function Collars:ExplodeCollar(timer)
     if timer then
         BeepNet:FireAll("BeepNet", timer-1, self.Model)
@@ -23,6 +25,8 @@ function Collars:ExplodeCollar(timer)
     else
         if self.Model then
             self.Model.light.Color = Color3.fromRGB(248, 43, 43)
+            self.Model.Head.beep:Play()
+            task.wait(0.2)
         end
     end
     if self.Character then
@@ -40,6 +44,21 @@ function Collars:ExplodeCollar(timer)
             Head:SetAttribute("Exploded", true)
             Head:SetAttribute("Health",0)
         end
+    end
+end
+
+function Collars:DestroySystem()
+    if self.Model then
+        self.Model:Destroy()
+        self.Model = nil
+    end
+    self.Character = nil
+    self = nil -- fully GC'd
+end
+
+function Collars:WipeAllCollars()
+    for _,collar in pairs(ActiveCollars) do
+        collar:DestroySystem()
     end
 end
 
@@ -63,6 +82,7 @@ function Collars.new(character)
         Collar.Head.equip:Play()
         Collar.Head.lock:Play()
     end
+    table.insert(ActiveCollars,NewCollar)
     return NewCollar
 end
 

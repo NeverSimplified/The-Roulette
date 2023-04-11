@@ -17,6 +17,12 @@ local ShakeService, super = class("ShakeService", Superclass)
 
 local ColoringUI = Roact.Component:extend("ColoringUI")
 
+local Earringing = Instance.new("Sound")
+Earringing.Parent = script
+Earringing.SoundId = 'rbxassetid://1517024660'
+Earringing.Volume = 2
+Earringing.Looped = false
+
 function ColoringUI:init()
     self.FrameRef = Roact.createRef()
     self.motor = Flipper.SingleMotor.new(self.props.Transparency)
@@ -48,9 +54,17 @@ end
 
 function ShakeService:Start()
     local ClientShake = Red.Client("CameraShake")
-    ClientShake:On("CameraShake", function(strength, length, coloring, Transparency, velocity)
+    ClientShake:On("CameraShake", function(strength, length, coloring, Transparency, velocity, ringing, ringingVolume)
         task.spawn(function()
             local BeginTime = os.clock()
+            local C
+            if ringing then
+                C = Earringing:Clone()
+                C.Parent = script
+                C.Looped = true
+                C.Volume = ringingVolume or 4
+                C:Play()
+            end
             while true do
                 if os.clock() - BeginTime >= length then
                     break
@@ -60,12 +74,18 @@ function ShakeService:Start()
                 local Y = RandomNum:NextInteger(-strength,strength) / 1000 * Percentage
                 local Z = RandomNum:NextInteger(-strength,strength) / 1000 * Percentage
                 local Character = Players.LocalPlayer.Character
+                if C then
+                    C.Volume = 1 * Percentage
+                end
                 if Character then
                     local Humanoid = Character.Humanoid
                     Humanoid.CameraOffset = Vector3.new(X,Y,Z)
                     workspace.CurrentCamera.CFrame *= CFrame.Angles(X/strength, Y/strength, Z/strength)
                 end
                 task.wait()
+            end
+            if C then
+                C:Destroy()
             end
             local Character = Players.LocalPlayer.Character
             if Character then

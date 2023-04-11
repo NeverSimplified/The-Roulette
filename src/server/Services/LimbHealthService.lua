@@ -103,7 +103,11 @@ function OnCharacterAdded(character)
                     LimbDestructionSound(objectInPairs)
                     local Player = Players:GetPlayerFromCharacter(character)
                     if Player then
-                        Net:Fire(Player,"CameraShake",250,1,Color3.fromRGB(255, 57, 57),0.6,0.5)
+                        if objectInPairs.Name == 'Head' then
+                            Net:Fire(Player,"CameraShake",550,1,Color3.fromRGB(255, 57, 57),0.2,0.5)
+                        else
+                            Net:Fire(Player,"CameraShake",250,1,Color3.fromRGB(255, 57, 57),0.7,0.5)
+                        end
                     end
                     if not objectInPairs:GetAttribute("Exploded") then
                         local ClonedObject = objectInPairs:Clone()

@@ -77,6 +77,7 @@ function onCharacter(character)
             workspace.CurrentCamera.CameraType = Enum.CameraType.Scriptable
             local origin = workspace.CurrentCamera.CFrame
             DeathCameraTrove:Connect(RunService.RenderStepped, function(deltaTime)
+                workspace.CurrentCamera.CFrame *= CFrame.new(Humanoid.CameraOffset)
                 workspace.CurrentCamera.CFrame = workspace.CurrentCamera.CFrame:Lerp(CFrame.new(origin.Position + Vector3.new(0,4.5,0), Head.Position), 0.8 * deltaTime)
             end)
             task.wait(5)
@@ -84,7 +85,9 @@ function onCharacter(character)
             if Bash then
                 Bash:Play()
             end
-            ColorCorrection.TintColor = Color3.fromRGB(0,0,0)
+            if ColorCorrection then
+                ColorCorrection.TintColor = Color3.fromRGB(0,0,0)
+            end
             task.wait(3)
             local DeathRespawn = red.Client("DeathRespawn")
             DeathRespawn:Fire("DeathRespawn")

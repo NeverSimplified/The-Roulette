@@ -37,7 +37,6 @@ function DeathManagerService:Start()
         if player.Character then
             if Traced[player] then
                 Traced[player] = nil
-                player:Kick("Attempting to play with remote events, go play something else")
                 return
             end
             Traced[player] = true
@@ -66,7 +65,6 @@ function DeathManagerService:Start()
     end)
     DeathRespawn:On("DeathRespawn", function(player)
         if not Traced[player] then
-            player:Kick("Attempting to manipulate events")
             return
         end
         DeathTrove:Clean()

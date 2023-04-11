@@ -1,8 +1,27 @@
 local CollectionService = game:GetService("CollectionService")
+local ServerStorage = game:GetService("ServerStorage")
 local RNG = Random.new()
 local ActiveChairs = {}
 local chairsModule = {}
 
+local OriginalChairs = {}
+if not ServerStorage:FindFirstChild("OriginalChairs") then
+    local Folder = Instance.new("Folder")
+    Folder.Name = 'OriginalChairs'
+    Folder.Parent = ServerStorage
+    for _,chair in pairs(CollectionService:GetTagged("Chairs")) do
+        local Cloned = chair:Clone()
+        Cloned.Parent = Folder
+        local ObjectValue = Instance.new("ObjectValue")
+        ObjectValue.Value = chair.Parent
+        ObjectValue.Name = 'RealParent'
+        ObjectValue.Parent = Cloned
+        CollectionService:RemoveTag(Cloned, "Chairs")
+        table.insert(OriginalChairs, Cloned)
+    end
+else
+    OriginalChairs = ServerStorage:FindFirstChild("OriginalChairs"):GetChildren()
+end
 function chairsModule:RetrieveAChair()
     local CollectedChairs = CollectionService:GetTagged("Chairs")
     local InactiveChairs = {}
@@ -16,32 +35,19 @@ function chairsModule:RetrieveAChair()
     return Chair
 end
 
-function chairsModule:TransparencyChair(chair, transparency)
-    for _,object in pairs(chair:GetDescendants()) do
-        if object:IsA("BasePart") and not object:IsA("Seat") then
-            object.Transparency = transparency
-            if object:FindFirstChildOfClass("Seat") then
-                if transparency ~= 1 then
-                    object:FindFirstChildOfClass("Seat").Disabled = false
-                else
-                    object:FindFirstChildOfClass("Seat").Disabled = true
-                end
-            end
-        end
-    end
-end
-
-function chairsModule:ReturnAChair(chair)
-    if ActiveChairs[chair] then
-        self:TransparencyChair(chair, 0)
-        ActiveChairs[chair] = nil
-    end
+function chairsModule:TransparencyChair(chair)
+    chair:Destroy()
 end
 
 function chairsModule:ResetChairs()
     local CollectedChairs = CollectionService:GetTagged("Chairs")
-    for _,chair in ipairs(CollectedChairs) do
-        self:TransparencyChair(chair, 0)
+    for _,chair in pairs(CollectedChairs) do
+        chair:Destroy()
+    end
+    for _,chair in pairs(OriginalChairs) do
+        local newChair = chair:Clone()
+        newChair.Parent = chair.RealParent.Value
+        CollectionService:AddTag(newChair, "Chairs")
     end
     ActiveChairs = {}
 end

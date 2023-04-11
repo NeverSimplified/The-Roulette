@@ -18,7 +18,9 @@ local Services = {
     "Utility/ShakeService";
     "Utility/DeathService";
     "Utility/GameTextService";
+    "Utility/PlayerSetup";
     "Administration/AdminService";
+    "Action/GunService";
 }
 function FrameworkMain:BootServices()
     warn('---- [ LOADING SYSTEMS ] ----')

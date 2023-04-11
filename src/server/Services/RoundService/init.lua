@@ -11,6 +11,7 @@ local Chairs = import("Modules/Chairs")
 local trove = import("Packages/trove")
 local janitor = import("Packages/janitor")
 local ShotgunCollars = import("Modules/ShotgunCollars")
+local ragdolling = import("Modules/Ragdolling")
 
 local RNG = Random.new()
 
@@ -36,15 +37,21 @@ local INTERMISSION_TIME = 5
 local RoundTimeTrove = trove.new()
 
 function RoundService:LoadInPlayers()
+    local ValidPlayers = {}
+    local ChairsDictionary = {}
     for _,player in pairs(LobbyTeam:GetPlayers()) do
         if player.Character then
             if player.Character:FindFirstChildOfClass("Humanoid") then
                 if player.Character.Humanoid.Health > 0 then
+                    ragdolling:UnRagdoll(player.Character)
                     player.Character.Humanoid.JumpHeight = 0
+                    player.Character.HumanoidRootPart.Anchored = true
                     player.Team = PlayingTeam 
                     local chair = Chairs:RetrieveAChair()
                     local seat = chair:FindFirstChild("Seat", true)
+                    chair:SetAttribute("Occupant", player.Name)
                     player.Character.HumanoidRootPart.CFrame = seat.CFrame
+                    player.Character.HumanoidRootPart.Anchored = false
                     RoundTimeTrove:Connect(player.Character.Humanoid.StateChanged, function(old,new)
                         if player.Team == LobbyTeam then
                             return
@@ -56,30 +63,34 @@ function RoundService:LoadInPlayers()
                             player.Character.Humanoid.Health = 0
                         end
                     end)
+                    table.insert(ValidPlayers, player)
+                    ChairsDictionary[player] = chair
                 end
             end
         end
     end
     local InactiveChairs = Chairs:InactiveChairs()
     for _,chair in pairs(InactiveChairs) do
-        Chairs:TransparencyChair(chair, 1)
+        Chairs:TransparencyChair(chair)
     end
     self:SetAfterText('')
+    return ValidPlayers, ChairsDictionary
 end
 
-function RoundService:EndRound()
+function RoundService:EndRound(ActivePlayers)
     self:SetAfterText('')
     self:SetGameText('Round Ended')
     self:ServerLights(true)
     self:BlindPlayers(false)
     task.wait(1.5)
-    for _,player in pairs(PlayingTeam:GetPlayers()) do
+    for _,player in pairs(ActivePlayers) do
         if player.Character then
             player.Team = LobbyTeam 
             player:LoadCharacter()
         end
     end
     task.wait(1.5)
+    ShotgunCollars:WipeAllCollars()
     CleanNet:FireAll("CleanNet")
     task.spawn(function()
         local LimbDebris = workspace:WaitForChild("LimbDebris",1)
@@ -90,6 +101,8 @@ function RoundService:EndRound()
     Chairs:ResetChairs()
     RoundTimeTrove:Clean()
     Cleaner:Cleanup()
+    self:ServerLights(true)
+    GameRunning = false
 end
 
 function RoundService:SetGameText(text)
@@ -127,6 +140,7 @@ function RoundService:Start()
     if not PlayingTeam or not LobbyTeam then
         error('Please create the correct teams for the game to have functional rounds. You need a "Playing" team and a "Lobby" team with correct collectionservice tags.')
     end
+    local LastUsedGamemode
     promise.new(function()
         while task.wait() do -- not recommended but whatever
             if #LobbyTeam:GetPlayers() < MINIMUM_PLAYERS and GameRunning == false then
@@ -164,11 +178,16 @@ function RoundService:Start()
                             table.insert(modules, module)
                         end
                     end
+                    if #Gamemodes > 1 and LastUsedGamemode then
+                        if table.find(modules,LastUsedGamemode) then
+                            table.remove(modules,table.find(modules,LastUsedGamemode))
+                        end
+                    end
                     GamemodeModule = modules[RNG:NextInteger(1,#modules)]
                 end
                 local LoadFailed = nil
-                local RoundStarted = false
                 if GamemodeModule then
+                    LastUsedGamemode = GamemodeModule
                     local RequiredModule = require(GamemodeModule)
                     if RequiredModule.Start and RequiredModule.init then
                         local success,err = pcall(RequiredModule.init)
@@ -178,10 +197,25 @@ function RoundService:Start()
                             self:ServerLights(false)
                             self:BlindPlayers(true)
                             task.wait(1.5)
-                            self:LoadInPlayers()
                             self:SetGameText(`Gamemode: {RequiredModule.GamemodeDisplayText or GamemodeModule.Name}`)
-                            task.wait(1.5)
-                            local success,err = pcall(RequiredModule.Start) -- yields
+                            local RoundTime = false
+                            local startTime = os.clock()
+                            task.spawn(function()
+                                repeat task.wait() until RoundTime or os.clock() - startTime > 400
+                                if not RoundTime then
+                                    TeleportService.TeleportInitFailed:Connect(function(player)
+                                        player:Kick("We're sorry, this server had a critical failure and your teleport to another server has failed.")
+                                    end)
+                                    for _,player in pairs(Players:GetChildren()) do
+                                        TeleportService:Teleport(game.PlaceId, player)
+                                    end
+                                    Players.PlayerAdded:Connect(function(player)
+                                        TeleportService:Teleport(game.PlaceId, player)
+                                    end)
+                                end
+                            end)
+                            local ActivePlayers, ChairsDictionary = self:LoadInPlayers()
+                            local success,err = pcall(RequiredModule.Start, ActivePlayers, ChairsDictionary) -- yields
                             if not success then
                                 self:ServerLights(true)
                                 self:BlindPlayers(false)
@@ -189,7 +223,7 @@ function RoundService:Start()
                                 LoadFailed = `Failed starting: {GamemodeModule.Name}. Please screenshot this into bug reports.`
                                 warn(`Failed starting gamemode: {GamemodeModule.Name}, error: {err}`)
                             else
-                                RoundStarted = true
+                                RoundTime = true
                             end
                         else
                             GamemodeModule:SetAttribute("Disabled", true)
@@ -205,12 +239,9 @@ function RoundService:Start()
                         self:SetAfterText(` [ {i} seconds ] `)
                         task.wait(1)
                     end
+                    self:ServerLights(true)
+                    GameRunning = false
                 end
-                if RoundStarted then
-                    self:EndRound()
-                end
-                self:ServerLights(true)
-                GameRunning = false
             end
         end
     end):catch(function(err)
