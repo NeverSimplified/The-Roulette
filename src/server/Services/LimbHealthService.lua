@@ -1,3 +1,6 @@
+-- Inspired by Criminality made by RVVZ.
+-- Limbs have an HP integer attribute. If it reaches 0 their limb is hidden and a clone is made with some "gorey" parts made visible on the client where the limb used to be.
+
 local Debris = game:GetService("Debris")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CollectionService = game:GetService("CollectionService")
@@ -27,7 +30,7 @@ local LimbDebris = Instance.new("Folder")
 LimbDebris.Parent = workspace
 LimbDebris.Name = 'LimbDebris'
 
-function LimbDestructionSound(object)
+function LimbDestructionSound(object) -- Speaks for itself honestly
     local Sound = Instance.new("Sound")
     Sound.Parent = object
     Sound.Name = 'LimbDestruction'
@@ -40,7 +43,7 @@ function LimbDestructionSound(object)
     end)
 end
 
-function CreateHumanoidModel(character)
+function CreateHumanoidModel(character) -- So the limb looks like its from a player, it has different characteristics if not parented under a humanoid model.
     local Model = Instance.new("Model")
     Model.Name = character.Name
     Model.Parent = LimbDebris
@@ -110,7 +113,7 @@ function OnCharacterAdded(character)
                         end
                     end
                     if not objectInPairs:GetAttribute("Exploded") then
-                        local ClonedObject = objectInPairs:Clone()
+                        local ClonedObject = objectInPairs:Clone() -- Clone of the limb so it just doesnt dissapear
                         ClonedObject.Parent = Model
                         ClonedObject.CFrame = objectInPairs.CFrame
                         ClonedObject.AssemblyLinearVelocity = objectInPairs.AssemblyLinearVelocity
@@ -128,11 +131,11 @@ function OnCharacterAdded(character)
                                 end
                             end
                         end
-                        ClonedObject:SetNetworkOwner(nil)
+                        ClonedObject:SetNetworkOwner(nil) -- Anti-exploit measure
                         local GoreExternal = CollectionService:GetTagged("Gore-External")[1]
                         if GoreExternal then
                             local LimbAddon = GoreExternal:FindFirstChild(objectInPairs.Name)
-                            if LimbAddon then
+                            if LimbAddon then -- Weld the "gorey" things
                                 local ClonedAddon = LimbAddon:Clone()
                                 ClonedAddon.Parent = ClonedObject
                                 ClonedAddon:PivotTo(ClonedObject.CFrame)
