@@ -1,3 +1,5 @@
+-- CLIENT CONTROLLER FOR THE SYSTEM BEHIND A GUN IN THE GUN HAZARD GAMEMODE
+
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
