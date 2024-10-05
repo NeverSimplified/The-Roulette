@@ -23,6 +23,7 @@ local GunAnimFolder = CollectionService:GetTagged("GunAnimations")[1]
 
 local ActiveAnimations = {}
 
+-- Render a highlight upon the potential target of the player
 local TargetUsernameUI = roact.Component:extend()
 function TargetUsernameUI:render()
     return roact.createElement("BillboardGui", {
@@ -65,6 +66,7 @@ function onCharacter(character)
     end
     local Humanoid = character:WaitForChild("Humanoid")
     local Animator = Humanoid:WaitForChild("Animator")
+    -- Broadened system in the case of potential future update which adds more guns or gun remodels as skins.
     character.ChildAdded:Connect(function(obj)
         if obj:IsA("Tool") and CollectionService:HasTag(obj, "Guns") then
             local UI = roact.createElement(TargetUsernameUI, {})
@@ -104,6 +106,7 @@ function onCharacter(character)
                     end
                 end
             end)
+            -- Heartbeat to check if there is a player on the shooter's cursor, if there is one, highlight them using the roact component. Could've used a better function for detection instead of heartbeat.
             GunTrove:Connect(RunService.Heartbeat, function()
                 if Mouse.Target and not obj:GetAttribute("Used") then
                     local ModelParent = Mouse.Target:FindFirstAncestorOfClass("Model")
@@ -159,7 +162,7 @@ function onCharacter(character)
                 roact.unmount(roactHandle)
                 roactHandle = nil
             end
-            GunTrove:Clean()
+            GunTrove:Clean() -- clear all the connections related to the guns, prevent a memory leak.
             for _,track in pairs(ActiveAnimations) do
                 track:Stop()
             end
