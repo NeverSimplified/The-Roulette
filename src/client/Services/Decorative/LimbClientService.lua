@@ -1,3 +1,5 @@
+-- Client part of the server limb system. Provided just as context.
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local import = require(ReplicatedStorage.Packages.import)
 
