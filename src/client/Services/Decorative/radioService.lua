@@ -1,3 +1,5 @@
+-- Script made to handle the decorative radio in the corner of the lobby. Plays music.
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CollectionService = game:GetService("CollectionService")
 local TweenService = game:GetService("TweenService")
@@ -32,7 +34,7 @@ function RadioUI:init()
     self.LabelRef = Roact.createRef()
     self.HolderRef = Roact.createRef()
 end
-function RadioUI:render()
+function RadioUI:render() -- Create the UI which displays the current song
     return Roact.createElement("BillboardGui", {
         [Roact.Ref] = self.HolderRef;
         Size = UDim2.fromScale(8,0.5);
@@ -67,7 +69,7 @@ end
 
 function radioService:Start()
     local Music = CollectionService:GetTagged("RadioMusic")
-    Foreach(CollectionService:GetTagged("Radios"), function(radioObject)
+    Foreach(CollectionService:GetTagged("Radios"), function(radioObject) -- Support for multiple radios
         local UI = Roact.createElement(RadioUI, {
             Song = '',
         })
@@ -77,7 +79,7 @@ function radioService:Start()
     task.spawn(function()
         while true do
             Foreach(CollectionService:GetTagged("Radios"), function(radioObject)
-                if not ActiveRadios[radioObject] then
+                if not ActiveRadios[radioObject] then -- Radio loop, if there isn't an active song playing then play one.
                     ActiveRadios[radioObject] = true
                     local LocalMusic = {table.unpack(Music)}
                     if LastSongInRadio[radioObject] then
@@ -126,7 +128,7 @@ function radioService:Start()
                 local Object = Holder.Parent
                 local Camera = workspace.CurrentCamera
                 local Distance = (Camera.CFrame.Position - Object.Position).Magnitude
-                if Distance <= 25 then
+                if Distance <= 25 then -- Hide the UI displaying the music if the camera is too far away from the radio object
                     if not Label.Visible then
                         table.remove(ActiveReferences, i)
                         Label.Visible = true
@@ -140,7 +142,7 @@ function radioService:Start()
                         end)
                     end
                 else
-                    if Label.Visible then
+                    if Label.Visible then -- Show the UI
                         table.remove(ActiveReferences, i)
                         Label.TextTransparency = 0
                         Holder.SizeOffset = Vector2.new(0,2)
@@ -155,7 +157,7 @@ function radioService:Start()
                 end
             end
             task.wait(1)
-            Cleaner:Cleanup()
+            Cleaner:Cleanup() -- Clear connections
         end
     end)
 end
